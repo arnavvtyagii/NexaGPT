@@ -228,3 +228,94 @@ input::placeholder {
   justify-content: center;
   padding: 8px;
 }
+
+@media (max-width: 1024px) {
+  .inputBox {
+    max-width: 600px;
+  }
+
+  .dropdown {
+    right: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .chatWindow {
+    justify-content: flex-start;
+    padding-bottom: 100px; /* space for fixed input */
+  }
+
+  .navbar span {
+    margin: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .userIconDiv {
+    margin: 1rem;
+  }
+
+  .inputBox {
+    max-width: 90%;
+  }
+
+  input {
+    padding: 16px;
+    font-size: 0.85rem;
+    border-radius: 12px;
+  }
+
+  .controls {
+    width: 60px;
+    height: 60px;
+    font-size: 18px;
+    right: 10px;
+  }
+
+  .dropdown {
+    top: 3.5rem;
+    right: 1rem;
+    width: 150px;
+  }
+
+  .authPopup {
+    width: 90%;
+    max-width: 320px;
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar span {
+    font-size: 0.8rem;
+  }
+
+  .inputBox {
+    max-width: 95%;
+  }
+
+  input {
+    padding: 14px;
+    font-size: 0.8rem;
+  }
+
+  .info {
+    font-size: 0.7rem;
+    padding: 0.3rem;
+  }
+
+  .dropdown {
+    width: 140px;
+    right: 0.5rem;
+  }
+
+  .authButtons {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .controls {
+    width: 55px;
+    height: 55px;
+    font-size: 16px;
+  }
+}
