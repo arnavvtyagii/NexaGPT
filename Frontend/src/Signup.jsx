@@ -39,7 +39,7 @@ function Signup() {
 
       // Automatically log in
       const loginResponse = await fetch(
-        "http://localhost:8080/api/auth/login",
+        "https://nexagpt.onrender.com/api/auth/login",
         {
           method: "POST",
           headers: {
