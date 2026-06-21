@@ -24,7 +24,7 @@ function ChatWindow() {
   const [showAuthPopup, setShowAuthPopup] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [liveTranscript, setLiveTranscript] = useState("");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
@@ -139,21 +139,14 @@ function ChatWindow() {
   };
   return (
     <>
-      <div className="chatWindow" onClick={() => setSidebarOpen(false)}>
+      <div className="chatWindow">
         <div className="navbar">
-          <div className="hamburger" onClick={() => setSidebarOpen(true)}>
-            <i className="fa-solid fa-bars"></i>
-          </div>
           <span>NexaGPT</span>
 
-          <div className="navRight">
-            <button className="newChatBtn">New Chat</button>
-
-            <div className="userIconDiv" onClick={handleProfileClick}>
-              <div className="userIcon">
-                <i className="fa-solid fa-user"></i>
-              </div>
-            </div>
+          <div className="userIconDiv" onClick={handleProfileClick}>
+            <span className="userIcon">
+              <i className="fa-solid fa-user"></i>
+            </span>
           </div>
         </div>
 
