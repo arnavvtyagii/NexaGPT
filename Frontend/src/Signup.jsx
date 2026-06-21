@@ -6,16 +6,16 @@ function Signup() {
   const navigate = useNavigate();
 
   const [username, setUsername] = useState("");
-
   const [email, setEmail] = useState("");
-
   const [password, setPassword] = useState("");
-
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSignup = async () => {
     try {
       setError("");
+      setLoading(true);
+
       const signupResponse = await fetch(
         "https://nexagpt.onrender.com/api/auth/signup",
         {
@@ -32,12 +32,13 @@ function Signup() {
       );
 
       const signupData = await signupResponse.json();
+
       if (!signupResponse.ok) {
         setError(signupData.message);
         return;
       }
 
-      // Automatically log in
+      // auto login
       const loginResponse = await fetch(
         "https://nexagpt.onrender.com/api/auth/login",
         {
@@ -45,21 +46,24 @@ function Signup() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            email,
-            password,
-          }),
+          body: JSON.stringify({ email, password }),
         },
       );
 
       const loginData = await loginResponse.json();
 
-      localStorage.setItem("token", loginData.token);
+      if (!loginResponse.ok) {
+        setError("Signup succeeded but login failed.");
+        return;
+      }
 
+      localStorage.setItem("token", loginData.token);
       navigate("/");
     } catch (err) {
       console.log(err);
-      alert("Signup failed");
+      setError("Signup failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -91,11 +95,16 @@ function Signup() {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        <button className="authButton" onClick={handleSignup}>
-          Sign Up
+        <button
+          className="authButton"
+          onClick={handleSignup}
+          disabled={loading}
+        >
+          {loading ? "Creating..." : "Sign Up"}
         </button>
 
         {error && <p className="errorText">{error}</p>}
+
         <p className="authLink">
           Already have an account? <Link to="/login">Login</Link>
         </p>

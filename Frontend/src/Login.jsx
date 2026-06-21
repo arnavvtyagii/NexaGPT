@@ -1,17 +1,45 @@
-import "./Login.css";
+import "./Signup.css";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
-function Login() {
+function Signup() {
   const navigate = useNavigate();
 
+  const [username, setUsername] = useState("");
+
   const [email, setEmail] = useState("");
+
   const [password, setPassword] = useState("");
 
-  const handleLogin = async () => {
+  const [error, setError] = useState("");
+
+  const handleSignup = async () => {
     try {
-      const response = await fetch(
-        "https://nexagpt.onrender.com/api/auth/login",
+      setError("");
+      const signupResponse = await fetch(
+        "https://nexagpt.onrender.com/api/auth/signup",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username,
+            email,
+            password,
+          }),
+        },
+      );
+
+      const signupData = await signupResponse.json();
+      if (!signupResponse.ok) {
+        setError(signupData.message);
+        return;
+      }
+
+      // Automatically log in
+      const loginResponse = await fetch(
+        "https://nexagpt.onrender.com/api/auth/",
         {
           method: "POST",
           headers: {
@@ -24,26 +52,28 @@ function Login() {
         },
       );
 
-      const data = await response.json();
+      const loginData = await loginResponse.json();
 
-      if (!response.ok) {
-        alert(data.message);
-        return;
-      }
-
-      localStorage.setItem("token", data.token);
+      localStorage.setItem("token", loginData.token);
 
       navigate("/");
     } catch (err) {
       console.log(err);
-      alert("Login failed");
+      alert("Signup failed");
     }
   };
 
   return (
     <div className="authContainer">
       <div className="authBox">
-        <h1 className="authTitle">Welcome Back</h1>
+        <h1 className="authTitle">Create Account</h1>
+
+        <input
+          className="authInput"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
 
         <input
           className="authInput"
@@ -61,16 +91,17 @@ function Login() {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        <button className="authButton" onClick={handleLogin}>
-          Login
+        <button className="authButton" onClick={handleSignup}>
+          Sign Up
         </button>
 
+        {error && <p className="errorText">{error}</p>}
         <p className="authLink">
-          Don't have an account? <Link to="/signup">Sign Up</Link>
+          Already have an account? <Link to="/login">Login</Link>
         </p>
       </div>
     </div>
   );
 }
 
-export default Login;
+export default Signup;
