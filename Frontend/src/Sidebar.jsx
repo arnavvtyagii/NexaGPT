@@ -3,7 +3,7 @@ import { useContext, useEffect } from "react";
 import { MyContext } from "./MyContext.jsx";
 import { v1 as uuidv1 } from "uuid";
 
-function Sidebar({ sidebarOpen, setSidebarOpen }) {
+function Sidebar() {
   const {
     allThreads,
     setAllThreads,
@@ -22,15 +22,13 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
-
       const res = await response.json();
+      const filteredData = res.map((thread) => ({
+        threadId: thread.threadId,
+        title: thread.title,
+      }));
 
-      setAllThreads(
-        res.map((t) => ({
-          threadId: t.threadId,
-          title: t.title,
-        })),
-      );
+      setAllThreads(filteredData);
     } catch (err) {
       console.log(err);
     }
@@ -46,65 +44,99 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
     setReply(null);
     setCurrThreadId(uuidv1());
     setPrevChats([]);
-    setSidebarOpen(false);
   };
 
-  const changeThread = async (id) => {
-    setCurrThreadId(id);
+  const changeThread = async (newThreadId) => {
+    setCurrThreadId(newThreadId);
 
     try {
       const response = await fetch(
-        `https://nexagpt.onrender.com/api/thread/${id}`,
+        `https://nexagpt.onrender.com/api/thread/${newThreadId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         },
       );
-
       const res = await response.json();
+      if (!response.ok) {
+        console.log(res.error);
+        return;
+      }
+
+      if (!Array.isArray(res)) {
+        console.log("Invalid response");
+        return;
+      }
 
       setPrevChats(res);
       setNewChat(false);
       setReply(null);
-      setSidebarOpen(false);
     } catch (err) {
       console.log(err);
     }
   };
+  const deleteThread = async (threadId) => {
+    try {
+      const response = await fetch(
+        `https://nexagpt.onrender.com/api/thread/${threadId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        },
+      );
+      const res = await response.json();
+      console.log(res);
 
-  const deleteThread = async (id) => {
-    await fetch(`https://nexagpt.onrender.com/api/thread/${id}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
+      //updated threads re-render
+      setAllThreads((prev) =>
+        prev.filter((thread) => thread.threadId != threadId),
+      );
 
-    setAllThreads((prev) => prev.filter((t) => t.threadId !== id));
-
-    if (id === currThreadId) createNewChat();
+      if (threadId === currThreadId) {
+        createNewChat();
+      }
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   return (
-    <section className={`sidebar ${sidebarOpen ? "open" : ""}`}>
-      <button onClick={createNewChat}>New Chat</button>
+    <>
+      <section className="sidebar">
+        <button onClick={createNewChat}>
+          <img src="/blacklogo.png" alt="gpt logo" className="logo"></img>
+          <span>
+            <i className="fa-solid fa-pen-to-square"></i>
+          </span>
+        </button>
 
-      <ul className="history">
-        {allThreads?.map((t) => (
-          <li key={t.threadId} onClick={() => changeThread(t.threadId)}>
-            {t.title}
-            <i
-              className="fa-solid fa-trash"
-              onClick={(e) => {
-                e.stopPropagation();
-                deleteThread(t.threadId);
-              }}
-            />
-          </li>
-        ))}
-      </ul>
-    </section>
+        <ul className="history">
+          {allThreads?.map((thread, idx) => (
+            <li
+              key={idx}
+              onClick={(e) => changeThread(thread.threadId)}
+              className={thread.threadId === currThreadId ? "highlighted" : ""}
+            >
+              {thread.title}
+              <i
+                className="fa-solid fa-trash"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  deleteThread(thread.threadId);
+                }}
+              ></i>
+            </li>
+          ))}
+        </ul>
+
+        <div className="sign">
+          <p>By Arnav Tyagi &hearts;</p>
+        </div>
+      </section>
+    </>
   );
 }
 
