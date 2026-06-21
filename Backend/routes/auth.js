@@ -55,8 +55,6 @@ router.post("/signup", async (req, res) => {
   }
 });
 
-export default router;
-
 import jwt from "jsonwebtoken";
 
 router.post("/login", async (req, res) => {
@@ -87,3 +85,5 @@ router.post("/login", async (req, res) => {
 
   res.json({ token });
 });
+
+export default router;
