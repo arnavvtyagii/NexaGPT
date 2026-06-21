@@ -3,7 +3,7 @@ import { useContext, useEffect } from "react";
 import { MyContext } from "./MyContext.jsx";
 import { v1 as uuidv1 } from "uuid";
 
-function Sidebar() {
+function Sidebar({ sidebarOpen, setSidebarOpen }) {
   const {
     allThreads,
     setAllThreads,
@@ -22,13 +22,15 @@ function Sidebar() {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
-      const res = await response.json();
-      const filteredData = res.map((thread) => ({
-        threadId: thread.threadId,
-        title: thread.title,
-      }));
 
-      setAllThreads(filteredData);
+      const res = await response.json();
+
+      setAllThreads(
+        res.map((t) => ({
+          threadId: t.threadId,
+          title: t.title,
+        })),
+      );
     } catch (err) {
       console.log(err);
     }
@@ -44,99 +46,65 @@ function Sidebar() {
     setReply(null);
     setCurrThreadId(uuidv1());
     setPrevChats([]);
+    setSidebarOpen(false);
   };
 
-  const changeThread = async (newThreadId) => {
-    setCurrThreadId(newThreadId);
+  const changeThread = async (id) => {
+    setCurrThreadId(id);
 
     try {
       const response = await fetch(
-        `https://nexagpt.onrender.com/api/thread/${newThreadId}`,
+        `https://nexagpt.onrender.com/api/thread/${id}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         },
       );
-      const res = await response.json();
-      if (!response.ok) {
-        console.log(res.error);
-        return;
-      }
 
-      if (!Array.isArray(res)) {
-        console.log("Invalid response");
-        return;
-      }
+      const res = await response.json();
 
       setPrevChats(res);
       setNewChat(false);
       setReply(null);
+      setSidebarOpen(false);
     } catch (err) {
       console.log(err);
     }
   };
-  const deleteThread = async (threadId) => {
-    try {
-      const response = await fetch(
-        `https://nexagpt.onrender.com/api/thread/${threadId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        },
-      );
-      const res = await response.json();
-      console.log(res);
 
-      //updated threads re-render
-      setAllThreads((prev) =>
-        prev.filter((thread) => thread.threadId != threadId),
-      );
+  const deleteThread = async (id) => {
+    await fetch(`https://nexagpt.onrender.com/api/thread/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
 
-      if (threadId === currThreadId) {
-        createNewChat();
-      }
-    } catch (e) {
-      console.log(e);
-    }
+    setAllThreads((prev) => prev.filter((t) => t.threadId !== id));
+
+    if (id === currThreadId) createNewChat();
   };
 
   return (
-    <>
-      <section className="sidebar">
-        <button onClick={createNewChat}>
-          <img src="/blacklogo.png" alt="gpt logo" className="logo"></img>
-          <span>
-            <i className="fa-solid fa-pen-to-square"></i>
-          </span>
-        </button>
+    <section className={`sidebar ${sidebarOpen ? "open" : ""}`}>
+      <button onClick={createNewChat}>New Chat</button>
 
-        <ul className="history">
-          {allThreads?.map((thread, idx) => (
-            <li
-              key={idx}
-              onClick={(e) => changeThread(thread.threadId)}
-              className={thread.threadId === currThreadId ? "highlighted" : ""}
-            >
-              {thread.title}
-              <i
-                className="fa-solid fa-trash"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  deleteThread(thread.threadId);
-                }}
-              ></i>
-            </li>
-          ))}
-        </ul>
-
-        <div className="sign">
-          <p>By Arnav Tyagi &hearts;</p>
-        </div>
-      </section>
-    </>
+      <ul className="history">
+        {allThreads?.map((t) => (
+          <li key={t.threadId} onClick={() => changeThread(t.threadId)}>
+            {t.title}
+            <i
+              className="fa-solid fa-trash"
+              onClick={(e) => {
+                e.stopPropagation();
+                deleteThread(t.threadId);
+              }}
+            />
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 

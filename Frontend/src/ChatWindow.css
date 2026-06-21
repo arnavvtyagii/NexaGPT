@@ -228,3 +228,72 @@ input::placeholder {
   justify-content: center;
   padding: 8px;
 }
+.hamburger {
+  display: none;
+  margin-left: 1rem;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+/* group right side */
+.navRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: 1rem;
+}
+
+/* sidebar overlay for mobile */
+@media (max-width: 768px) {
+  .hamburger {
+    display: block;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    height: 100vh;
+    width: 260px;
+    background: var(--card);
+    z-index: 2000;
+    transition: 0.3s ease;
+  }
+
+  .sidebar.open {
+    left: 0;
+  }
+
+  .chatWindow {
+    width: 100%;
+  }
+}
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    height: 100vh;
+    width: 260px;
+    background: var(--card);
+    z-index: 2000;
+    transition: 0.3s ease;
+  }
+
+  .sidebar.open {
+    left: 0;
+  }
+
+  .hamburger {
+    display: block;
+    cursor: pointer;
+  }
+
+  .navRight {
+    margin-right: 1rem;
+  }
+
+  .chatWindow {
+    width: 100%;
+  }
+}
