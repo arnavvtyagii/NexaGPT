@@ -17,7 +17,7 @@ function Signup() {
     try {
       setError("");
       const signupResponse = await fetch(
-        "http://localhost:8080/api/auth/signup",
+        "https://nexagpt.onrender.com/api/auth/signup",
         {
           method: "POST",
           headers: {

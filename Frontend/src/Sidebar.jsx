@@ -17,7 +17,7 @@ function Sidebar() {
 
   const getAllThreads = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/thread", {
+      const response = await fetch("https://nexagpt.onrender.com/api/thread", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
