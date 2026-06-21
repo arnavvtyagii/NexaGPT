@@ -17,7 +17,7 @@ app.use(
   }),
 );
 
-app.options("*", cors());
+app.options(/.*/, cors());
 
 // 2. JSON parser
 app.use(express.json());
