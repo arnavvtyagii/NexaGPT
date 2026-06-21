@@ -20,6 +20,10 @@ app.use(
   }),
 );
 
+app.get("/", (req, res) => {
+  res.send("NexaGPT Backend is running");
+});
+
 app.listen(PORT, () => {
   console.log(`server running on ${PORT}`);
   connectDB();
