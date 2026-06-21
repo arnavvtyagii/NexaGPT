@@ -13,6 +13,13 @@ app.use(cors());
 app.use("/api", chatRoutes);
 app.use("/api/auth", authRoutes);
 
+app.use(
+  cors({
+    origin: ["https://nexa-gpt-delta.vercel.app/"],
+    credentials: true,
+  }),
+);
+
 app.listen(PORT, () => {
   console.log(`server running on ${PORT}`);
   connectDB();
