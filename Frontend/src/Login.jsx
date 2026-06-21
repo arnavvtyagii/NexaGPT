@@ -1,79 +1,52 @@
-import "./Signup.css";
+import "./Login.css";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
-function Signup() {
+function Login() {
   const navigate = useNavigate();
 
-  const [username, setUsername] = useState("");
-
   const [email, setEmail] = useState("");
-
   const [password, setPassword] = useState("");
-
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSignup = async () => {
+  const handleLogin = async () => {
     try {
       setError("");
-      const signupResponse = await fetch(
-        "https://nexagpt.onrender.com/api/auth/signup",
+      setLoading(true);
+
+      const response = await fetch(
+        "https://nexagpt.onrender.com/api/auth/login",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            username,
-            email,
-            password,
-          }),
+          body: JSON.stringify({ email, password }),
         },
       );
 
-      const signupData = await signupResponse.json();
-      if (!signupResponse.ok) {
-        setError(signupData.message);
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.message);
         return;
       }
 
-      // Automatically log in
-      const loginResponse = await fetch(
-        "https://nexagpt.onrender.com/api/auth/",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email,
-            password,
-          }),
-        },
-      );
-
-      const loginData = await loginResponse.json();
-
-      localStorage.setItem("token", loginData.token);
-
+      localStorage.setItem("token", data.token);
       navigate("/");
     } catch (err) {
       console.log(err);
-      alert("Signup failed");
+      setError("Login failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="authContainer">
       <div className="authBox">
-        <h1 className="authTitle">Create Account</h1>
-
-        <input
-          className="authInput"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
+        <h1 className="authTitle">Welcome Back</h1>
 
         <input
           className="authInput"
@@ -91,17 +64,18 @@ function Signup() {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        <button className="authButton" onClick={handleSignup}>
-          Sign Up
+        <button className="authButton" onClick={handleLogin} disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
         </button>
 
         {error && <p className="errorText">{error}</p>}
+
         <p className="authLink">
-          Already have an account? <Link to="/login">Login</Link>
+          Don't have an account? <Link to="/signup">Sign Up</Link>
         </p>
       </div>
     </div>
   );
 }
 
-export default Signup;
+export default Login;
